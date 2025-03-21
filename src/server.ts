@@ -2,6 +2,7 @@ import express from "express";
 import { WebSocketServer, WebSocket } from "ws";
 import dotenv from "dotenv";
 import cors from "cors";
+import { readVisitCount, writeVisitCount } from "./helper";
 
 dotenv.config();
 const app = express();
@@ -9,11 +10,12 @@ const PORT = process.env.PORT || 8010;
 
 app.use(cors());
 
-let visitCount = 0;
+let visitCount = readVisitCount()
 
 // Route to increment visit count
 app.get("/portfolio-visit", (_req, res) => {
   visitCount++;
+  writeVisitCount(visitCount);
   broadcastVisitCount();
   res.json({ message: `Portfolio visited ${visitCount} times.` });
 });
