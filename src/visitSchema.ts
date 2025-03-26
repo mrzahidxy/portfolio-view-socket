@@ -1,6 +1,10 @@
-import mongoose from "mongoose";
+import mongoose, { Model, Schema } from "mongoose";
 
-const visitSchema = new mongoose.Schema({
+export interface IVisit extends Document {
+  count: number;
+}
+
+const visitSchema:Schema<IVisit> = new mongoose.Schema({
   count: {
     type: Number,
     required: true,
@@ -8,6 +12,6 @@ const visitSchema = new mongoose.Schema({
   },
 });
 
-const Visit = mongoose.model("Visit", visitSchema);
+const Visit:Model<IVisit> = mongoose.model<IVisit>("Visit", visitSchema);
 
 export default Visit;

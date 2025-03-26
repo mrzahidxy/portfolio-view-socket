@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { WebSocketServer, WebSocket } from "ws";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -7,14 +7,13 @@ import mongoose from "mongoose";
 
 dotenv.config();
 
-
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGODB_URI as string)
   .then(() => {
     console.log("Connected to MongoDB");
   })
-  .catch((error:any) => {
+  .catch((error: unknown) => {
     console.error("Error connecting to MongoDB:", error);
   });
 
@@ -25,11 +24,16 @@ const PORT = process.env.PORT ?? 8010;
 app.use(cors());
 
 // Route to increment visit count
-app.get("/portfolio-visit", async (_req, res) => {
-  const visitCount = await readVisitCount();
-  incrementVisitCount();
-  broadcastVisitCount(visitCount);
-  res.json({ message: `Portfolio visited ${visitCount} times.` });
+app.get("/portfolio-visit", async (_req: Request, res: Response) => {
+  try {
+    const visitCount = await readVisitCount();
+    incrementVisitCount();
+    broadcastVisitCount(visitCount);
+    res.json({ message: `Portfolio visited ${visitCount} times.` });
+  } catch (error) {
+    console.error("Error incrementing visit count:", error);
+    res.status(500).json({ error: "Failed to increment visit count" });
+  }
 });
 
 // Start the Express server
